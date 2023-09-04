@@ -8,12 +8,20 @@
   }
 },
 {
+  "model": "polls.question",
+  "pk": 2,
+  "fields": {
+    "question_text": "Who is the most handsome?",
+    "pub_date": "2023-09-04T03:30:22Z"
+  }
+},
+{
   "model": "polls.choice",
   "pk": 1,
   "fields": {
     "question": 1,
     "choice_text": "Nissan",
-    "votes": 1
+    "votes": 3
   }
 },
 {
@@ -22,7 +30,7 @@
   "fields": {
     "question": 1,
     "choice_text": "Tesla",
-    "votes": 1
+    "votes": 2
   }
 },
 {
@@ -31,7 +39,43 @@
   "fields": {
     "question": 1,
     "choice_text": "Toyota",
-    "votes": 1
+    "votes": 2
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 4,
+  "fields": {
+    "question": 1,
+    "choice_text": "Abatacum",
+    "votes": 2
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 5,
+  "fields": {
+    "question": 2,
+    "choice_text": "Nake",
+    "votes": 0
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 6,
+  "fields": {
+    "question": 2,
+    "choice_text": "Toey",
+    "votes": 0
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 7,
+  "fields": {
+    "question": 2,
+    "choice_text": "Peach",
+    "votes": 0
   }
 }
 ]
