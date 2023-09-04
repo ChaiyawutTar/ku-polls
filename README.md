@@ -18,7 +18,7 @@ python manage.py runserver
 
 |Username|Passsword|
 |:--:|:--:|
-|Tar|santa0899953288|
+|admin|admin|
 
 ## Project Documents
 
