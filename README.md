@@ -14,9 +14,12 @@ cd ku-polls
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
+```
+
 |Username|Passsword|
 |:--:|:--:|
 |Tar|santa0899953288|
+
 ## Project Documents
 
 All project documents are in the [Project Wiki](../../wiki/Home).
