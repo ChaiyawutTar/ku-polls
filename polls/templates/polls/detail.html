@@ -10,3 +10,12 @@
     </fieldset>
     <input type="submit" value="Vote">
 </form>
+{% for question in latest_question_list %}
+    <h2><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></h2>
+    <p><a href="{% url 'polls:results' question.id %}">Results</a></p>
+{% endfor %}
+
+<p><a href="{% url 'polls:results' question.id %}">Results</a></p>
+<p><a href="{% url 'polls:index' %}">Back to List of Polls</a></p>
+
+
