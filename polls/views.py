@@ -110,7 +110,7 @@ def vote(request, question_id):
         vote.choice = selected_choice
     except Vote.DoesNotExist:
         # no matching vote - create a new Vote
-        vote = vote.objects.create(user=request.user, choice=selected_choice)
+        vote = Vote.objects.create(user=request.user, choice=selected_choice)
     # if the user has a vote for this question
     #     update his vote for selected_choice
     # else : 
