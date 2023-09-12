@@ -29,7 +29,7 @@ SECRET_KEY = config('SECRET_KEY', default='k2pd1p)zwe0qy0k25=sli+7+n^vd-0h*&6vga
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True # old DEBUG
 
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 # ALLOWED_HOSTS = [] # old ALLOWED_HOST
 
