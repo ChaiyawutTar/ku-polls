@@ -103,8 +103,6 @@ def vote(request, question_id):
             },
         )
     this_user = request.user
-    #selected_choice.votes += 1
-    #selected_choice.save()
     try:
         # find a vote for this user and this question
         vote = Vote.objects.get(user=this_user, choice__question=question)
@@ -118,6 +116,8 @@ def vote(request, question_id):
     # else : 
     #     create a new vote for this user and choice
     #     save it 
+    # selected_choice.votes += 1
+    # selected_choice.save()
     vote.save()
     # TODO: USe messages to display a confirmation on the results page.
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
