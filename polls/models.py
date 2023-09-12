@@ -17,9 +17,6 @@ class Question(models.Model):
     pub_date = models.DateTimeField('data published', default=timezone.now)
     end_date = models.DateTimeField('data end', null=True)
 
-    # def was_published_recently(self):
-    #     now = timezone.now()
-    #     return now - datetime.timedelta(day=1) <= self.pub_date <= now
     @admin.display(
         boolean=True,
         ordering="pub_date",
@@ -50,7 +47,6 @@ class Question(models.Model):
             return self.pub_date <= now
         else:
             return self.pub_date <= now <= self.end_date
-        # return self.pub_date <= now and (self.end_date is None or now <= self.end_date)
 
 
     def __str__(self) -> str:

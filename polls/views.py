@@ -9,6 +9,8 @@ from django.views import generic
 from django.utils import timezone
 from django.contrib import messages
 from .models import Question, Choice
+from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 
 class IndexView(generic.ListView):
     """
@@ -28,14 +30,10 @@ class IndexView(generic.ListView):
         Return the last five published questions (not including those set to be
         published in the future).
         """
-        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[
-            :5
-        ]
-    # def get_queryset(self):
-    #     """
-    #     Excludes any questions that aren't published yet.
-    #     """
-    #     return Question.objects.filter(pub_date__lte=timezone.now())
+        now = timezone.now()
+        return Question.objects.filter(
+            Q(pub_date__lte=now) & (Q(end_date__gte=now) | Q(end_date=None))
+        ).order_by("-pub_date")
     
 
 class DetailView(generic.DetailView):
@@ -72,30 +70,8 @@ class ResultsView(generic.DetailView):
     template_name = 'polls/results.html'
 
 
-# def index(request : HttpRequest) -> HttpResponse:
-#     lastest_question_list =  Question.objects.order_by("-pub_date")[:5]
-#     # template = loader.get_template("polls/index.html")
-#     context = {
-#         "lastest_question_list" : lastest_question_list
-#     }
-#     # output = ", ".join([q.question_text for q in lastest_question_list])
-#     return render(request, "polls/index.html", context)
 
-# def detail(request : HttpRequest, question_id) -> HttpResponse: 
-#     try:
-#         question = Question.objects.get(pk=question_id)
-#     except:
-#         raise Http404("Question does not exist.")
-#     return render(request, "polls/detail.html", {"question" : question})
-
-# def detail(request, question_id):
-#     question = get_object_or_404(Question, pk=question_id)
-#     return render(request, "polls/detail.html", {"question": question})
-
-# def results(request: HttpRequest, question_id) -> HttpResponse:
-#     question = get_object_or_404(Question, pk=question_id)
-#     return render(request, "polls/results.html", {"question": question})
-
+@login_required
 def vote(request, question_id):
     """
     Handle the voting process for a specific poll question.
@@ -108,6 +84,9 @@ def vote(request, question_id):
         HttpResponse: A redirect to the results page if the vote is successful, or a re-rendered voting form if there is an error.
     """
     question = get_object_or_404(Question, pk=question_id)
+    if not request.user.is_authenticated():
+        # user must login to vote
+        redirect('login')
     if not question.can_vote():
         messages.error(request, "Voting is not allowed for this question.")
         return redirect("polls:index")
