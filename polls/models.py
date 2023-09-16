@@ -49,7 +49,6 @@ class Question(models.Model):
         else:
             return self.pub_date <= now <= self.end_date
 
-
     def __str__(self) -> str:
         return self.question_text
 

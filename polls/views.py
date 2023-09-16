@@ -31,9 +31,18 @@ class IndexView(generic.ListView):
         published in the future).
         """
         now = timezone.now()
+        
         return Question.objects.filter(
-            Q(pub_date__lte=now) & (Q(end_date__gte=now) | Q(end_date=None))
-        ).order_by("-pub_date")
+            Q(pub_date__lte=now)).order_by("-pub_date")
+
+        # & (Q(end_date__gte=now) | Q(end_date=None))
+    def index(self, request):
+        latest_question_list = self.get_queryset()
+        context = {
+            'latest_question_list': latest_question_list,
+            'user': request.user,
+        }
+        return render(request, self.template_name, context)
     
 
 class DetailView(generic.DetailView):
@@ -63,11 +72,47 @@ class DetailView(generic.DetailView):
         published in the future).
         """
         return Question.objects.filter(pub_date__lte=timezone.now())
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Call the keep_context_of_user_vote function to get the previous choice
+        previous_choice = keep_context_of_user_vote(self.request, self.object.id)
+
+        # Add the previous_choice to the context
+        context['previous_choice'] = previous_choice
+
+        return context
 
 
 class ResultsView(generic.DetailView):
     model = Question
     template_name = 'polls/results.html'
+
+from django.shortcuts import render, get_object_or_404
+from django.http import Http404
+from django.contrib.auth.decorators import login_required
+from .models import Question, Choice, Vote
+
+@login_required
+def keep_context_of_user_vote(request, question_id):
+    """
+    Check if the user has voted on the current poll question and retrieve their previous choice.
+    """
+    question = get_object_or_404(Question, pk=question_id)
+    user = request.user
+
+    previous_choice = None
+
+    if question.can_vote():
+        try:
+            # Get the choice associated with the user's vote on this question
+            previous_vote = Vote.objects.get(user=user, choice__question=question)
+            previous_choice = previous_vote.choice
+        except Vote.DoesNotExist:
+            pass  # User hasn't voted on this question before, so previous_choice remains None
+
+    return previous_choice
 
 
 
@@ -119,7 +164,9 @@ def vote(request, question_id):
     # selected_choice.votes += 1
     # selected_choice.save()
     vote.save()
-    # TODO: USe messages to display a confirmation on the results page.
+    
+    messages.success(request, f"Your vote for '{selected_choice.choice_text}' has been saved. Successfully.")
+
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
     
 
