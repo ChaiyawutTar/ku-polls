@@ -4,8 +4,9 @@
         <legend><h1>{{ question.question_text }}</h1></legend>
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
         {% for choice in question.choice_set.all %}
-            <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-            <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+        <input type="radio" name="choice" id="choice{{ choice.id }}" value="{{ choice.id }}"
+        {% if choice == previous_choice %}checked{% endif %}>
+        <label for="choice{{ choice.id }}">{{ choice.choice_text }}</label><br>
         {% endfor %}
     </fieldset>
     <input type="submit" value="Vote">
@@ -15,6 +16,9 @@
     <p><a href="{% url 'polls:results' question.id %}">Results</a></p>
 {% endfor %}
 
+
+  
+  
 <p><a href="{% url 'polls:results' question.id %}">Results</a></p>
 <p><a href="{% url 'polls:index' %}">Back to List of Polls</a></p>
 

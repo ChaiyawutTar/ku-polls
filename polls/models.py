@@ -2,6 +2,7 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from django.contrib import admin
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Question(models.Model):
@@ -17,9 +18,6 @@ class Question(models.Model):
     pub_date = models.DateTimeField('data published', default=timezone.now)
     end_date = models.DateTimeField('data end', null=True)
 
-    # def was_published_recently(self):
-    #     now = timezone.now()
-    #     return now - datetime.timedelta(day=1) <= self.pub_date <= now
     @admin.display(
         boolean=True,
         ordering="pub_date",
@@ -50,8 +48,6 @@ class Question(models.Model):
             return self.pub_date <= now
         else:
             return self.pub_date <= now <= self.end_date
-        # return self.pub_date <= now and (self.end_date is None or now <= self.end_date)
-
 
     def __str__(self) -> str:
         return self.question_text
@@ -67,7 +63,18 @@ class Choice(models.Model):
     """
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
+    # votes = models.IntegerField(default=0)
 
+    @property
+    def votes(self):
+        #count the votes for this choice
+        return self.vote_set.count()
+    
     def __str__(self) -> str:
         return self.choice_text
+
+class Vote(models.Model):
+    """Records a Vote of a Choice by a User."""
+    choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+

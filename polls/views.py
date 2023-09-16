@@ -8,7 +8,14 @@ from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
 from django.contrib import messages
-from .models import Question, Choice
+from .models import Question, Choice , Vote
+from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login, authenticate
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
+
 
 class IndexView(generic.ListView):
     """
@@ -28,14 +35,19 @@ class IndexView(generic.ListView):
         Return the last five published questions (not including those set to be
         published in the future).
         """
-        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[
-            :5
-        ]
-    # def get_queryset(self):
-    #     """
-    #     Excludes any questions that aren't published yet.
-    #     """
-    #     return Question.objects.filter(pub_date__lte=timezone.now())
+        now = timezone.now()
+        
+        return Question.objects.filter(
+            Q(pub_date__lte=now)).order_by("-pub_date")
+
+        # & (Q(end_date__gte=now) | Q(end_date=None))
+    def index(self, request):
+        latest_question_list = self.get_queryset()
+        context = {
+            'latest_question_list': latest_question_list,
+            'user': request.user,
+        }
+        return render(request, self.template_name, context)
     
 
 class DetailView(generic.DetailView):
@@ -65,6 +77,17 @@ class DetailView(generic.DetailView):
         published in the future).
         """
         return Question.objects.filter(pub_date__lte=timezone.now())
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Call the keep_context_of_user_vote function to get the previous choice
+        previous_choice = keep_context_of_user_vote(self.request, self.object.id)
+
+        # Add the previous_choice to the context
+        context['previous_choice'] = previous_choice
+
+        return context
 
 
 class ResultsView(generic.DetailView):
@@ -72,30 +95,29 @@ class ResultsView(generic.DetailView):
     template_name = 'polls/results.html'
 
 
-# def index(request : HttpRequest) -> HttpResponse:
-#     lastest_question_list =  Question.objects.order_by("-pub_date")[:5]
-#     # template = loader.get_template("polls/index.html")
-#     context = {
-#         "lastest_question_list" : lastest_question_list
-#     }
-#     # output = ", ".join([q.question_text for q in lastest_question_list])
-#     return render(request, "polls/index.html", context)
+@login_required
+def keep_context_of_user_vote(request, question_id):
+    """
+    Check if the user has voted on the current poll question and retrieve their previous choice.
+    """
+    question = get_object_or_404(Question, pk=question_id)
+    user = request.user
 
-# def detail(request : HttpRequest, question_id) -> HttpResponse: 
-#     try:
-#         question = Question.objects.get(pk=question_id)
-#     except:
-#         raise Http404("Question does not exist.")
-#     return render(request, "polls/detail.html", {"question" : question})
+    previous_choice = None
 
-# def detail(request, question_id):
-#     question = get_object_or_404(Question, pk=question_id)
-#     return render(request, "polls/detail.html", {"question": question})
+    if question.can_vote():
+        try:
+            # Get the choice associated with the user's vote on this question
+            previous_vote = Vote.objects.get(user=user, choice__question=question)
+            previous_choice = previous_vote.choice
+        except Vote.DoesNotExist:
+            pass  # User hasn't voted on this question before, so previous_choice remains None
 
-# def results(request: HttpRequest, question_id) -> HttpResponse:
-#     question = get_object_or_404(Question, pk=question_id)
-#     return render(request, "polls/results.html", {"question": question})
+    return previous_choice
 
+
+
+@login_required
 def vote(request, question_id):
     """
     Handle the voting process for a specific poll question.
@@ -108,6 +130,9 @@ def vote(request, question_id):
         HttpResponse: A redirect to the results page if the vote is successful, or a re-rendered voting form if there is an error.
     """
     question = get_object_or_404(Question, pk=question_id)
+    # if not request.user.is_authenticated():
+    #     # user must login to vote
+    #     redirect('login')
     if not question.can_vote():
         messages.error(request, "Voting is not allowed for this question.")
         return redirect("polls:index")
@@ -115,22 +140,47 @@ def vote(request, question_id):
         selected_choice = question.choice_set.get(pk=request.POST["choice"])
     except (KeyError, Choice.DoesNotExist):
         # Redisplay the question voting form.
-        return render(
-            request,
-            "polls/detail.html",
-            {
-                "question": question,
-                "error_message": "You didn't select a choice.",
-            },
-        )
-    else:
-        selected_choice.votes += 1
-        selected_choice.save()
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button.
-        return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+        messages.error(request, "You didn't select a choice.")
+        return redirect("polls:detail", question_id)
+    this_user = request.user
+    try:
+        # find a vote for this user and this question
+        vote = Vote.objects.get(user=this_user, choice__question=question)
+        # update his vote
+        vote.choice = selected_choice
+    except Vote.DoesNotExist:
+        # no matching vote - create a new Vote
+        vote = Vote.objects.create(user=request.user, choice=selected_choice)
+    # if the user has a vote for this question
+    #     update his vote for selected_choice
+    # else : 
+    #     create a new vote for this user and choice
+    #     save it 
+    # selected_choice.votes += 1
+    # selected_choice.save()
+    vote.save()
+    
+    messages.success(request, f"Your vote for '{selected_choice.choice_text}' has been saved. Successfully.")
+
+    return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
     
 
+class SignUpView(CreateView):
+    """
+    View for user registration (signup).
 
+    Attributes:
+        template_name (str): The name of the template to render.
+        form_class: The form class to use for user registration (UserCreationForm in this case).
+        success_url: The URL to redirect to upon successful registration (login page in this example).
+    """
+    template_name = 'registration/signup.html'
+    form_class = UserCreationForm
+    success_url = reverse_lazy('polls:index')
 
+    def form_valid(self, form):
+        valid = super(SignUpView, self).form_valid(form)
+        username, password = form.cleaned_data.get("username"), form.cleaned_data.get("password1")
+        user = authenticate(username=username, password=password)
+        login(self.request, user)
+        return valid
