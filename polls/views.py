@@ -11,6 +11,11 @@ from django.contrib import messages
 from .models import Question, Choice , Vote
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login, authenticate
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
+
 
 class IndexView(generic.ListView):
     """
@@ -89,10 +94,6 @@ class ResultsView(generic.DetailView):
     model = Question
     template_name = 'polls/results.html'
 
-from django.shortcuts import render, get_object_or_404
-from django.http import Http404
-from django.contrib.auth.decorators import login_required
-from .models import Question, Choice, Vote
 
 @login_required
 def keep_context_of_user_vote(request, question_id):
@@ -139,14 +140,8 @@ def vote(request, question_id):
         selected_choice = question.choice_set.get(pk=request.POST["choice"])
     except (KeyError, Choice.DoesNotExist):
         # Redisplay the question voting form.
-        return render(
-            request,
-            "polls/detail.html",
-            {
-                "question": question,
-                "error_message": "You didn't select a choice.",
-            },
-        )
+        messages.error(request, "You didn't select a choice.")
+        return redirect("polls:detail", question_id)
     this_user = request.user
     try:
         # find a vote for this user and this question
@@ -170,5 +165,22 @@ def vote(request, question_id):
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
     
 
+class SignUpView(CreateView):
+    """
+    View for user registration (signup).
 
+    Attributes:
+        template_name (str): The name of the template to render.
+        form_class: The form class to use for user registration (UserCreationForm in this case).
+        success_url: The URL to redirect to upon successful registration (login page in this example).
+    """
+    template_name = 'registration/signup.html'
+    form_class = UserCreationForm
+    success_url = reverse_lazy('polls:index')
 
+    def form_valid(self, form):
+        valid = super(SignUpView, self).form_valid(form)
+        username, password = form.cleaned_data.get("username"), form.cleaned_data.get("password1")
+        user = authenticate(username=username, password=password)
+        login(self.request, user)
+        return valid
