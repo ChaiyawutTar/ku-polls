@@ -58,10 +58,19 @@ python -m virtualenv .venv
 ```bash
 .venv\Scripts\activate
 ```
+## Demo SuperUser
 
 |Username|Passsword|
 |:--:|:--:|
 |admin|admin|
+
+## Demo User
+
+|Username|Password|
+|:--:|:--:|
+|santa|Santa0818313336|
+|harry|hackme|
+|Peach|Peach0818313336|
 
 ## Project Documents
 
