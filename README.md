@@ -13,7 +13,7 @@ https://cpske.github.io/ISP) course at Kasetsart University.
 1. Install [Python 3.11.4 or later](https://www.python.org/downloads/)
 2. Run these commands to clone and install requirements.txt
 ```bash
-git clone https://github.com/Sosokker/ku-polls
+git clone https://github.com/ChaiyawutTar/ku-polls
 cd ku-polls
 pip install -r requirements.txt
 ```
