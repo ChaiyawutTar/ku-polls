@@ -19,7 +19,8 @@ python manage.py shell -c "from django.core.management.utils import get_random_s
 or 
 - [Django Secret Key Generator #1](https://djecrety.ir/)
 - [Django Secret Key Generator #2](https://miniwebtool.com/django-secret-key-generator/)
-*Don't forget to change `your_secret_key` to your secret key (without quote)**
+
+**Don't forget to change `your_secret_key` to your secret key (without quote)**
 
 4. Run these commands
 ```bash
