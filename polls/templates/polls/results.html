@@ -1,3 +1,7 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'polls/style.css' %}">
+
 <h1>{{ question.question_text }}</h1>
 
 {% if messages %}
@@ -8,7 +12,7 @@
 </ul>
 {% endif %}
 
-<table>
+<table class="table">
     <thead>
         <tr>
             <th>Choice</th>

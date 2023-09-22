@@ -1,14 +1,13 @@
 from typing import Any
 from django.db.models.query import QuerySet
 from django.shortcuts import redirect, render, get_object_or_404
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
-from django.template import loader
+from django.http import HttpResponseRedirect
 from django.http import Http404
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
 from django.contrib import messages
-from .models import Question, Choice , Vote
+from .models import Question, Choice, Vote
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
@@ -26,7 +25,6 @@ class IndexView(generic.ListView):
         context_object_name (str): The name of the context variable containing the question list.
     """
 
-
     template_name = "polls/index.html"
     context_object_name = "latest_question_list"
 
@@ -36,7 +34,7 @@ class IndexView(generic.ListView):
         published in the future).
         """
         now = timezone.now()
-        
+
         return Question.objects.filter(
             Q(pub_date__lte=now)).order_by("-pub_date")
 
@@ -48,7 +46,7 @@ class IndexView(generic.ListView):
             'user': request.user,
         }
         return render(request, self.template_name, context)
-    
+
 
 class DetailView(generic.DetailView):
     """
@@ -70,14 +68,14 @@ class DetailView(generic.DetailView):
 
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
-    
+
     def get_queryset(self) -> QuerySet[Any]:
         """
         Return the last five published questions (not including those set to be
         published in the future).
         """
         return Question.objects.filter(pub_date__lte=timezone.now())
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -116,7 +114,6 @@ def keep_context_of_user_vote(request, question_id):
     return previous_choice
 
 
-
 @login_required
 def vote(request, question_id):
     """
@@ -127,7 +124,8 @@ def vote(request, question_id):
         question_id (int): The ID of the question being voted on.
 
     Returns:
-        HttpResponse: A redirect to the results page if the vote is successful, or a re-rendered voting form if there is an error.
+        HttpResponse: A redirect to the results page if the vote is successful, or
+        a re-rendered voting form if there is an error.
     """
     question = get_object_or_404(Question, pk=question_id)
     # if not request.user.is_authenticated():
@@ -153,17 +151,17 @@ def vote(request, question_id):
         vote = Vote.objects.create(user=request.user, choice=selected_choice)
     # if the user has a vote for this question
     #     update his vote for selected_choice
-    # else : 
+    # else :
     #     create a new vote for this user and choice
-    #     save it 
+    #     save it
     # selected_choice.votes += 1
     # selected_choice.save()
     vote.save()
-    
-    messages.success(request, f"Your vote for '{selected_choice.choice_text}' has been saved. Successfully.")
+    messages.success(request,
+                     f"Your vote for '{selected_choice.choice_text}' has been saved. Successfully.")
 
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
-    
+
 
 class SignUpView(CreateView):
     """
@@ -172,7 +170,8 @@ class SignUpView(CreateView):
     Attributes:
         template_name (str): The name of the template to render.
         form_class: The form class to use for user registration (UserCreationForm in this case).
-        success_url: The URL to redirect to upon successful registration (login page in this example).
+        success_url: The URL to redirect to upon successful registration
+        (login page in this example).
     """
     template_name = 'registration/signup.html'
     form_class = UserCreationForm

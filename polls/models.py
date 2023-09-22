@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.contrib import admin
 from django.contrib.auth.models import User
 
+
 # Create your models here.
 class Question(models.Model):
     """
@@ -14,6 +15,7 @@ class Question(models.Model):
         pub_date (datetime): The publication date of the question.
         end_date (datetime): The ending date for voting on the question.
     """
+
     question_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField('data published', default=timezone.now)
     end_date = models.DateTimeField('data end', null=True)
@@ -29,14 +31,14 @@ class Question(models.Model):
         """
         now = timezone.now()
         return now - datetime.timedelta(days=1) <= self.pub_date <= now
-    
+
     def is_published(self):
         """
         Returns True if the current local date is on or after the question's publication date.
         """
         now = timezone.localtime(timezone.now())
         return now >= self.pub_date
-    
+
     def can_vote(self):
         """
         Returns True if voting is allowed for this question.
@@ -51,6 +53,7 @@ class Question(models.Model):
 
     def __str__(self) -> str:
         return self.question_text
+
 
 class Choice(models.Model):
     """
@@ -67,14 +70,14 @@ class Choice(models.Model):
 
     @property
     def votes(self):
-        #count the votes for this choice
+        # count the votes for this choice
         return self.vote_set.count()
-    
+
     def __str__(self) -> str:
         return self.choice_text
+
 
 class Vote(models.Model):
     """Records a Vote of a Choice by a User."""
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-

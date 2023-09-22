@@ -1,0 +1,11 @@
+[flake8]
+max-line-length = 100
+exclude=
+    migrations
+    mysite
+    logs
+    .venv
+    apps.py
+    setting.py
+per-file-ignores =
+    .\polls\models.py: F811
