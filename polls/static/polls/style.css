@@ -82,3 +82,54 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table th, .table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.table th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.question-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.question-list li {
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #f2f2f2;
+}
+
+.question-list h1 a {
+    text-decoration: none;
+    color: #333;
+}
+
+.question-list p {
+    margin: 0;
+}
+
+.question-list a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.question-list a:hover {
+    text-decoration: underline;
+}
+

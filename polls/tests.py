@@ -1,12 +1,11 @@
 import datetime
 
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
-from .models import Question, Choice, Vote
-from .views import SignUpView
+from .models import Question, Choice
+
 
 class QuestionModelTests(TestCase):
     def test_was_published_recently_with_future_question(self):
@@ -17,7 +16,7 @@ class QuestionModelTests(TestCase):
         time = timezone.now() + datetime.timedelta(days=30)
         future_question = Question(pub_date=time)
         self.assertIs(future_question.was_published_recently(), False)
-        
+
     def test_was_published_recently_with_old_question(self):
         """
         was_published_recently() returns False for questions whose pub_date
@@ -43,7 +42,7 @@ class QuestionModelTests(TestCase):
         future_pub_date = timezone.now() + timezone.timedelta(days=1)
         question = Question(pub_date=future_pub_date)
         self.assertFalse(question.is_published())
-    
+
     def test_is_published_default_pub_date(self):
         """
         is_published() should return True for a question with the default pub date (now).
@@ -62,14 +61,16 @@ class QuestionModelTests(TestCase):
 
     def test_can_vote_when_end_date_is_none(self):
         """
-        can_vote() should return True when end_date is None, indicating that voting is allowed anytime after pub_date.
+        can_vote() should return True when end_date is None,
+        indicating that voting is allowed anytime after pub_date.
         """
         question = Question()
         self.assertTrue(question.can_vote())
 
     def test_can_vote_within_voting_period(self):
         """
-        can_vote() should return True when the current time is within the voting period (between pub_date and end_date).
+        can_vote() should return True when the current time is within
+        the voting period (between pub_date and end_date).
         """
         current_time = timezone.now()
         future_end_date = current_time + timezone.timedelta(days=1)
@@ -78,7 +79,8 @@ class QuestionModelTests(TestCase):
 
     def test_cannot_vote_after_end_date(self):
         """
-        can_vote() should return False if the end_date is in the past, indicating that voting is not allowed.
+        can_vote() should return False if the end_date is in the past,
+        indicating that voting is not allowed.
         """
         past_end_date = timezone.now() - timezone.timedelta(days=1)
         question = Question(end_date=past_end_date)
@@ -86,13 +88,13 @@ class QuestionModelTests(TestCase):
 
     def test_cannot_vote_before_pub_date(self):
         """
-        can_vote() should return False if the current time is before the pub_date, indicating that voting is not allowed.
+        can_vote() should return False if the current time is before
+        the pub_date,indicating that voting is not allowed.
         """
         future_pub_date = timezone.now() + timezone.timedelta(days=1)
         question = Question(pub_date=future_pub_date)
         self.assertFalse(question.can_vote())
-    
-        
+
 
 # dadad
 def create_question(question_text, days):
@@ -137,8 +139,6 @@ class QuestionIndexViewTests(TestCase):
         self.assertContains(response, "No polls are available.")
         self.assertQuerySetEqual(response.context["latest_question_list"], [])
 
-
-
     def test_future_question_and_past_question(self):
         """
         Even if both past and future questions exist, only past questions
@@ -164,6 +164,7 @@ class QuestionIndexViewTests(TestCase):
             [question2, question1],
         )
 
+
 class QuestionDetailViewTests(TestCase):
     def test_future_question(self):
         """
@@ -184,7 +185,8 @@ class QuestionDetailViewTests(TestCase):
         url = reverse("polls:detail", args=(past_question.id,))
         response = self.client.get(url)
         self.assertContains(response, past_question.question_text)
-    
+
+
 class SignUpViewTests(TestCase):
     def test_signup_view_exists(self):
         response = self.client.get(reverse('signup'))
@@ -209,7 +211,6 @@ class SignUpViewTests(TestCase):
         self.assertRedirects(response, reverse("polls:index"))
 
 
-
 class VoteTests(TestCase):
     def setUp(self):
         # Create a test user
@@ -228,7 +229,6 @@ class VoteTests(TestCase):
             question=self.test_question,
             choice_text='Test Choice'
         )
-       
 
     def test_vote(self):
         # Login with the test user
@@ -270,7 +270,7 @@ class VoteTests(TestCase):
 
         # Test user's vote with an invalid choice
         response = self.client.post(reverse('polls:vote', args=(self.test_question.id,)), {
-            'choice' : 999
+            'choice': 999
         })
 
         self.assertRedirects(response, reverse('polls:detail', args=(self.test_question.id,)))
