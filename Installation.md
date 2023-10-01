@@ -25,8 +25,8 @@ or
 4. Run these commands
 ```bash
 python manage.py migrate
-python manage.py loaddata data/polls.json
 python manage.py loaddata data/user.json
+python manage.py loaddata data/polls.json
 python manage.py runserver
 ```
 Then connect to `http://127.0.0.1:8000/` or `localhost:8000/`
