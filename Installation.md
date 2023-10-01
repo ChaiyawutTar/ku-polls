@@ -19,14 +19,14 @@ python manage.py shell -c "from django.core.management.utils import get_random_s
 or 
 - [Django Secret Key Generator #1](https://djecrety.ir/)
 - [Django Secret Key Generator #2](https://miniwebtool.com/django-secret-key-generator/)
-  
+
 **Don't forget to change `your_secret_key` to your secret key (without quote)**
 
 4. Run these commands
 ```bash
 python manage.py migrate
-python manage.py loaddata data/polls-v1.json
 python manage.py loaddata data/user.json
+python manage.py loaddata data/polls.json
 python manage.py runserver
 ```
 Then connect to `http://127.0.0.1:8000/` or `localhost:8000/`
