@@ -64,7 +64,7 @@ class DetailView(generic.DetailView):
 
         # Check if the poll is votable
         if not self.object.can_vote():
-            raise Http404("This poll is closed and cannot be voted on.")
+            return redirect('polls:closed_poll') # here is redirect for closed polls
 
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
@@ -183,3 +183,6 @@ class SignUpView(CreateView):
         user = authenticate(username=username, password=password)
         login(self.request, user)
         return valid
+
+def closed_poll_view(request):
+    return render(request, 'polls/closed_poll.html')

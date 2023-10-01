@@ -36,6 +36,33 @@
   }
 },
 {
+  "model": "polls.question",
+  "pk": 7,
+  "fields": {
+    "question_text": "What creatures are strange from them?",
+    "pub_date": "2023-10-01T12:39:50Z",
+    "end_date": "2023-10-30T12:41:04Z"
+  }
+},
+{
+  "model": "polls.question",
+  "pk": 8,
+  "fields": {
+    "question_text": "What kind of Thai food do people like the most?",
+    "pub_date": "2023-10-01T12:44:22Z",
+    "end_date": "2023-10-30T12:44:26Z"
+  }
+},
+{
+  "model": "polls.question",
+  "pk": 9,
+  "fields": {
+    "question_text": "What mobile games are the most popular in Thailand?",
+    "pub_date": "2023-10-01T12:45:31Z",
+    "end_date": "2023-10-30T12:45:42Z"
+  }
+},
+{
   "model": "polls.choice",
   "pk": 1,
   "fields": {
@@ -124,6 +151,86 @@
   }
 },
 {
+  "model": "polls.choice",
+  "pk": 18,
+  "fields": {
+    "question": 7,
+    "choice_text": "Bird"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 19,
+  "fields": {
+    "question": 7,
+    "choice_text": "Dog"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 20,
+  "fields": {
+    "question": 7,
+    "choice_text": "Cat"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 21,
+  "fields": {
+    "question": 8,
+    "choice_text": "Fried basi (ผัดกระเพรา)"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 22,
+  "fields": {
+    "question": 8,
+    "choice_text": "Pad Thai"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 23,
+  "fields": {
+    "question": 8,
+    "choice_text": "Tom Yum Kung"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 24,
+  "fields": {
+    "question": 9,
+    "choice_text": "Rov"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 25,
+  "fields": {
+    "question": 9,
+    "choice_text": "Cookie run"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 26,
+  "fields": {
+    "question": 9,
+    "choice_text": "Subway Surfer"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 27,
+  "fields": {
+    "question": 9,
+    "choice_text": "Speed lifter"
+  }
+},
+{
   "model": "polls.vote",
   "pk": 1,
   "fields": {
@@ -185,6 +292,14 @@
   "fields": {
     "choice": 6,
     "user": 7
+  }
+},
+{
+  "model": "polls.vote",
+  "pk": 9,
+  "fields": {
+    "choice": 7,
+    "user": 2
   }
 }
 ]
